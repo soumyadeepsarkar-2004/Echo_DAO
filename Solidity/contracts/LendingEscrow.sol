@@ -370,9 +370,13 @@ contract LendingEscrow is Ownable, ReentrancyGuard {
             return 50;
         }
         
-        // Calculate based on history
+        // Calculate based on history with bounds checking
         uint256 defaultRate = (profile.defaultedLoans * 100) / profile.totalLoans;
         uint256 completionRate = (profile.completedLoans * 100) / profile.totalLoans;
+        
+        // Ensure rates don't exceed 100
+        if (defaultRate > 100) defaultRate = 100;
+        if (completionRate > 100) completionRate = 100;
         
         // Risk score: higher default rate = higher risk, higher completion rate = lower risk
         uint256 riskScore = defaultRate + (100 - completionRate);
@@ -382,6 +386,7 @@ contract LendingEscrow is Ownable, ReentrancyGuard {
             riskScore = riskScore > 20 ? riskScore - 20 : 0;
         }
         
+        // Ensure risk score is within bounds
         return riskScore > 100 ? 100 : riskScore;
     }
     
@@ -390,7 +395,9 @@ contract LendingEscrow is Ownable, ReentrancyGuard {
      */
     function _calculateInterestRate(uint256 _riskScore) internal pure returns (uint256) {
         // Base rate 5% + risk-adjusted rate (0-10%)
-        uint256 riskPremium = (_riskScore * 10) / 100;
+        // Using constant multiplier for risk premium calculation
+        uint256 RISK_PREMIUM_MULTIPLIER = 10;
+        uint256 riskPremium = (_riskScore * RISK_PREMIUM_MULTIPLIER) / 100;
         return BASE_INTEREST_RATE + riskPremium;
     }
     
