@@ -21,12 +21,6 @@ async function main() {
   const tx = await treasury.transferOwnership(await echoDAO.getAddress());
   await tx.wait();
   console.log("✅ Ownership transferred successfully.");
-
-  // 4️⃣ Deploy LendingEscrow
-  const LendingEscrow = await ethers.getContractFactory("LendingEscrow");
-  const lendingEscrow = await LendingEscrow.deploy();
-  await lendingEscrow.waitForDeployment();
-  console.log("LendingEscrow deployed to:", await lendingEscrow.getAddress());
 }
 
 main().catch((error) => {
