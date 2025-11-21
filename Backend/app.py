@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import report_routes, proposal_routes, fund_routes, lending_routes
+from routes import report_routes, proposal_routes, fund_routes
 
 app = FastAPI(
     title="EchoDAO Backend",
@@ -20,7 +20,6 @@ app.add_middleware(
 app.include_router(report_routes.router, prefix="/reports", tags=["Reports"])
 app.include_router(proposal_routes.router, prefix="/proposals", tags=["Proposals"])
 app.include_router(fund_routes.router, prefix="/funds", tags=["Funds"])
-app.include_router(lending_routes.router, prefix="/lending", tags=["Lending"])
 
 @app.get("/")
 def root():

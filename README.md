@@ -14,23 +14,10 @@ A revolutionary DAO platform built on Celo blockchain that combines on-chain gov
 
 ## 🎯 Overview
 
-**EchoDAO** is a revolutionary P2P micro-lending platform that combines decentralized governance with smart lending infrastructure. Built on Celo blockchain, it enables borrowers to request small loans while lenders fund them with transparent terms. An Ethereum escrow contract manages loan release, interest calculations, lock-in periods, incentives, and penalties—building trust and enabling financial access for the unbanked.
+**EchoDAO** empowers communities to make collective decisions through a transparent, secure, and democratic governance system. Every proposal, vote, and transaction is recorded immutably on the Celo blockchain, ensuring complete transparency and auditability.
 
 ### ✨ Key Features
 
-#### 💸 P2P Micro-Lending
-- 🏦 **Smart Loan Requests** - Borrowers request loans with transparent terms
-- 💰 **Lender Marketplace** - Browse and fund loans with competitive returns
-- 🔒 **Escrow Management** - Automated loan disbursement and repayment handling
-- 📈 **Interest Calculation** - Dynamic interest rates based on risk scores
-- ⏰ **Lock-in Periods** - Early repayment incentives (10% discount)
-- ⚠️ **Penalty System** - Late payment penalties (15%) for accountability
-- 🎯 **Risk Scoring** - Transparent risk assessment (0-100 scale)
-- 📊 **User Dashboards** - Track borrowed and lent loans in real-time
-- 📅 **Loan Timelines** - Visual progress tracking and deadline monitoring
-- 🌟 **Reputation System** - Build trust through successful repayments
-
-#### 🗳️ DAO Governance
 - 🗳️ **On-Chain Governance** - Create proposals, vote, and execute decisions entirely on the blockchain
 - 🤖 **AI Verification** - BART-CNN model verifies content authenticity and generates summaries
 - 📁 **IPFS Storage** - Decentralized, censorship-resistant storage via Pinata
@@ -137,81 +124,7 @@ npx hardhat run scripts/deploy.js --network alfajores
 
 ## 📖 Usage Guide
 
-### 🏦 P2P Lending Platform
-
-#### Requesting a Loan (Borrowers)
-
-1. **Connect Wallet** - Click "Connect Wallet" in the header
-2. Navigate to **Lending → Request Loan** from the menu
-3. **Fill Loan Details:**
-   - Loan Amount (0.1 - 10 ETH)
-   - Duration (30, 90, 180, or 365 days)
-   - Lock-in Period (0-60 days for early repayment discount)
-   - Purpose (description of loan use)
-4. **Review Estimated Terms:**
-   - Interest rate based on your risk score
-   - Total repayment amount
-   - Early repayment discount available
-5. **Submit Request** - Confirm transaction in MetaMask
-6. **Wait for Funding** - Lenders will review and fund your request
-7. **Receive Funds** - Funds automatically transferred to your wallet (minus 1% platform fee)
-
-#### Funding Loans (Lenders)
-
-1. **Connect Wallet** - Ensure you have CELO in your wallet
-2. Navigate to **Lending → Fund Loans** from the menu
-3. **Browse Loan Requests:**
-   - Filter by risk level (Low/Medium/High)
-   - Review borrower details and risk scores
-   - Check interest rates and expected returns
-4. **Select a Loan:**
-   - Click on a loan to view full details
-   - Analyze borrower's reputation score
-   - Review loan purpose
-5. **Fund the Loan:**
-   - Click "Fund Loan"
-   - Confirm transaction in MetaMask
-   - Loan automatically disbursed to borrower
-6. **Earn Interest** - Receive principal + interest when loan is repaid
-
-#### Managing Loans
-
-1. Navigate to **Lending → Loan Dashboard**
-2. **Borrowed Loans Tab:**
-   - View all your active and completed loans
-   - See repayment progress bars
-   - Make partial or full repayments
-   - Track time remaining
-   - View reputation score
-3. **Lent Loans Tab:**
-   - Monitor loans you've funded
-   - Track repayment status
-   - View interest earned
-   - See borrower repayment history
-
-#### Understanding Risk Scores
-
-- **Risk Score (0-100):** Lower is better
-  - 0-30: Low Risk (Green) - Reliable borrowers
-  - 30-60: Medium Risk (Yellow) - Average borrowers
-  - 60-100: High Risk (Red) - Higher default probability
-
-- **Reputation Score (0-1000):** Higher is better
-  - Increases with successful repayments (+10 per loan)
-  - Decreases with defaults (-50 per default)
-  - Affects future interest rates
-
-#### Interest & Fees
-
-- **Base Interest Rate:** 5% annually
-- **Risk Premium:** 0-10% based on risk score
-- **Early Repayment Discount:** 10% off interest if repaid within lock-in period
-- **Late Payment Penalty:** 15% on principal if overdue
-- **Platform Fee:** 1% deducted from loan disbursement
-
-### 🗳️ DAO Governance
-
-#### Creating a Proposal
+### Creating a Proposal
 
 1. **Connect Wallet** - Click "Connect Wallet" in the header
 2. **Upload Report** (Optional) - Submit a file for AI verification
@@ -223,7 +136,7 @@ npx hardhat run scripts/deploy.js --network alfajores
 4. **Submit** - First proposal is FREE, subsequent proposals cost 0.01 CELO
 5. **Wait for Voting** - Proposal is active for ~1000 blocks (~4 hours)
 
-#### Voting on Proposals
+### Voting on Proposals
 
 1. Navigate to **Active Proposals** page
 2. Browse available proposals with AI-generated summaries
@@ -231,7 +144,7 @@ npx hardhat run scripts/deploy.js --network alfajores
 4. Confirm transaction in MetaMask
 5. Vote is recorded on-chain immediately
 
-#### Executing Proposals
+### Executing Proposals
 
 1. Navigate to **Fund Redistribution** page
 2. View pending proposals that have passed voting
@@ -302,27 +215,6 @@ EchoDAO/
 ---
 
 ## 🔗 Smart Contracts
-
-### LendingEscrow Contract
-**Core lending platform contract managing P2P micro-loans**
-
-**Key Functions:**
-- `requestLoan(uint256 principal, uint256 duration, uint256 lockInPeriod, string purpose)` - Request a new loan
-- `fundLoan(uint256 loanId)` - Fund a loan request as a lender
-- `repayLoan(uint256 loanId)` - Make loan repayment (partial or full)
-- `markAsDefaulted(uint256 loanId)` - Mark overdue loan as defaulted
-- `calculateTotalOwed(uint256 loanId)` - Calculate total amount owed including interest/penalties
-- `getBorrowerLoans(address borrower)` - Get all loans for a borrower
-- `getLenderLoans(address lender)` - Get all loans for a lender
-- `getActiveLoanRequests()` - Get all available loan requests
-
-**Features:**
-- 1% platform fee on loan disbursement
-- 5% base interest rate + risk-adjusted premium
-- 10% discount for early repayment within lock-in period
-- 15% penalty for late payment after loan duration
-- Transparent risk scoring (0-100)
-- Reputation system for borrowers (0-1000)
 
 ### EchoDAO Contract
 - **Address**: `0x8db40a9d69cA368Df80A4966C082a4FD3F16802A`
@@ -474,29 +366,14 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🚀 Roadmap
 
-### Completed ✅
-- ✅ **P2P Lending Platform** - Smart contracts for borrowing and lending
-- ✅ **Risk Scoring System** - Transparent risk assessment
-- ✅ **Interest & Penalties** - Automated calculations
-- ✅ **User Dashboards** - Track loans and reputation
-- ✅ **Loan Timelines** - Visual progress tracking
-- ✅ **Escrow Management** - Secure fund handling
-
-### In Progress 🚧
-- 🚧 **Mainnet Deployment** - Deploy to Celo mainnet
-- 🚧 **Multi-signature Treasury** - Enhanced security for loan pool
-- 🚧 **Delegation Voting** - Delegate voting power for loan approvals
-- 🚧 **Advanced Analytics Dashboard** - Detailed insights and metrics
-- 🚧 **NFT-based Membership** - Tiered membership with benefits
-- 🚧 **Cross-chain Governance** - Multi-chain support
-
-### Future Plans 🔮
-- [ ] Credit score integration with external oracles
-- [ ] Collateralized loans
-- [ ] Loan insurance pool
-- [ ] Mobile app (iOS & Android)
-- [ ] Loan marketplace with secondary trading
-- [ ] Integration with DeFi protocols
+- [ ] Mainnet deployment
+- [ ] Multi-signature treasury
+- [ ] Delegation voting
+- [ ] Proposal templates
+- [ ] Mobile app
+- [ ] Advanced analytics dashboard
+- [ ] NFT-based membership
+- [ ] Cross-chain governance
 
 ---
 

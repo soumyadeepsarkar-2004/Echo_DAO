@@ -7,9 +7,6 @@ import ActiveProposalsPage from './pages/ActiveProposalsPage';
 import ProposalHistoryPage from './pages/ProposalHistoryPage';
 import FundRedistributionPage from './pages/FundRedistributionPage';
 import TechnologyStackPage from './pages/TechnologyStackPage';
-import BorrowPage from './pages/BorrowPage';
-import LendPage from './pages/LendPage';
-import LoanDashboardPage from './pages/LoanDashboardPage';
 import CosmicBackground from './components/CosmicBackground';
 
 function App() {
@@ -25,9 +22,6 @@ function App() {
           <Route path="/proposal-history" element={<ProposalHistoryPage />} />
           <Route path="/fund-redistribution" element={<FundRedistributionPage />} />
           <Route path="/technology-stack" element={<TechnologyStackPage />} />
-          <Route path="/borrow" element={<BorrowPage />} />
-          <Route path="/lend" element={<LendPage />} />
-          <Route path="/loan-dashboard" element={<LoanDashboardPage />} />
         </Routes>
         <Footer />
       </div>
