@@ -19,7 +19,9 @@ LENDING_CONTRACT_ADDRESS = os.getenv("LENDING_CONTRACT_ADDRESS", "")
 w3 = Web3(Web3.HTTPProvider("https://alfajores-forno.celo-testnet.org"))
 
 # Load contract ABI
-with open("blockchain/abi/LendingEscrow.json", "r") as f:
+import pathlib
+abi_path = pathlib.Path(__file__).parent.parent / "blockchain" / "abi" / "LendingEscrow.json"
+with open(abi_path, "r") as f:
     LENDING_ABI = json.load(f)
 
 
