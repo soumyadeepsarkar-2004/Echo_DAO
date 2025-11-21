@@ -13,6 +13,7 @@ const Header = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [isProposalsOpen, setIsProposalsOpen] = useState(false);
   const [isFundingOpen, setIsFundingOpen] = useState(false);
+  const [isLendingOpen, setIsLendingOpen] = useState(false);
 
   // Force disconnect on mount to require fresh authorization
   useEffect(() => {
@@ -148,6 +149,54 @@ const Header = () => {
             </div>
           </div>
           
+          {/* Lending Dropdown */}
+          <div className="relative group">
+            <button
+              onMouseEnter={() => setIsLendingOpen(true)}
+              onMouseLeave={() => setIsLendingOpen(false)}
+              className="text-gray-300 hover:text-blue-400 transition-colors flex items-center space-x-1"
+            >
+              <span>Lending</span>
+              <ChevronDown className="w-4 h-4" />
+            </button>
+            
+            {/* Dropdown Menu */}
+            <div
+              onMouseEnter={() => setIsLendingOpen(true)}
+              onMouseLeave={() => setIsLendingOpen(false)}
+              className={`absolute left-0 top-full mt-2 w-56 bg-gray-900 border border-gray-700 rounded-lg shadow-xl overflow-hidden transition-all duration-200 ${
+                isLendingOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+              }`}
+            >
+              <Link
+                to="/borrow"
+                onClick={() => setIsLendingOpen(false)}
+                className="block px-4 py-3 text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-colors border-b border-gray-800"
+              >
+                <div className="font-semibold">Request Loan</div>
+                <div className="text-xs text-gray-500">Submit a loan request</div>
+              </Link>
+              
+              <Link
+                to="/lend"
+                onClick={() => setIsLendingOpen(false)}
+                className="block px-4 py-3 text-gray-300 hover:bg-purple-500/10 hover:text-purple-400 transition-colors border-b border-gray-800"
+              >
+                <div className="font-semibold">Fund Loans</div>
+                <div className="text-xs text-gray-500">Browse and fund loan requests</div>
+              </Link>
+              
+              <Link
+                to="/loan-dashboard"
+                onClick={() => setIsLendingOpen(false)}
+                className="block px-4 py-3 text-gray-300 hover:bg-blue-500/10 hover:text-blue-400 transition-colors"
+              >
+                <div className="font-semibold">Loan Dashboard</div>
+                <div className="text-xs text-gray-500">Manage your loans</div>
+              </Link>
+            </div>
+          </div>
+
           {/* Funding Dropdown */}
           <div className="relative group">
             <button
