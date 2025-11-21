@@ -14,10 +14,23 @@ A revolutionary DAO platform built on Celo blockchain that combines on-chain gov
 
 ## 🎯 Overview
 
-**EchoDAO** empowers communities to make collective decisions through a transparent, secure, and democratic governance system. Every proposal, vote, and transaction is recorded immutably on the Celo blockchain, ensuring complete transparency and auditability.
+**EchoDAO** is a revolutionary P2P micro-lending platform that combines decentralized governance with smart lending infrastructure. Built on Celo blockchain, it enables borrowers to request small loans while lenders fund them with transparent terms. An Ethereum escrow contract manages loan release, interest calculations, lock-in periods, incentives, and penalties—building trust and enabling financial access for the unbanked.
 
 ### ✨ Key Features
 
+#### 💸 P2P Micro-Lending
+- 🏦 **Smart Loan Requests** - Borrowers request loans with transparent terms
+- 💰 **Lender Marketplace** - Browse and fund loans with competitive returns
+- 🔒 **Escrow Management** - Automated loan disbursement and repayment handling
+- 📈 **Interest Calculation** - Dynamic interest rates based on risk scores
+- ⏰ **Lock-in Periods** - Early repayment incentives (10% discount)
+- ⚠️ **Penalty System** - Late payment penalties (15%) for accountability
+- 🎯 **Risk Scoring** - Transparent risk assessment (0-100 scale)
+- 📊 **User Dashboards** - Track borrowed and lent loans in real-time
+- 📅 **Loan Timelines** - Visual progress tracking and deadline monitoring
+- 🌟 **Reputation System** - Build trust through successful repayments
+
+#### 🗳️ DAO Governance
 - 🗳️ **On-Chain Governance** - Create proposals, vote, and execute decisions entirely on the blockchain
 - 🤖 **AI Verification** - BART-CNN model verifies content authenticity and generates summaries
 - 📁 **IPFS Storage** - Decentralized, censorship-resistant storage via Pinata
@@ -216,6 +229,27 @@ EchoDAO/
 
 ## 🔗 Smart Contracts
 
+### LendingEscrow Contract
+**Core lending platform contract managing P2P micro-loans**
+
+**Key Functions:**
+- `requestLoan(uint256 principal, uint256 duration, uint256 lockInPeriod, string purpose)` - Request a new loan
+- `fundLoan(uint256 loanId)` - Fund a loan request as a lender
+- `repayLoan(uint256 loanId)` - Make loan repayment (partial or full)
+- `markAsDefaulted(uint256 loanId)` - Mark overdue loan as defaulted
+- `calculateTotalOwed(uint256 loanId)` - Calculate total amount owed including interest/penalties
+- `getBorrowerLoans(address borrower)` - Get all loans for a borrower
+- `getLenderLoans(address lender)` - Get all loans for a lender
+- `getActiveLoanRequests()` - Get all available loan requests
+
+**Features:**
+- 1% platform fee on loan disbursement
+- 5% base interest rate + risk-adjusted premium
+- 10% discount for early repayment within lock-in period
+- 15% penalty for late payment after loan duration
+- Transparent risk scoring (0-100)
+- Reputation system for borrowers (0-1000)
+
 ### EchoDAO Contract
 - **Address**: `0x8db40a9d69cA368Df80A4966C082a4FD3F16802A`
 - **Network**: Celo Alfajores Testnet
@@ -366,14 +400,29 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ## 🚀 Roadmap
 
-- [ ] Mainnet deployment
-- [ ] Multi-signature treasury
-- [ ] Delegation voting
-- [ ] Proposal templates
-- [ ] Mobile app
-- [ ] Advanced analytics dashboard
-- [ ] NFT-based membership
-- [ ] Cross-chain governance
+### Completed ✅
+- ✅ **P2P Lending Platform** - Smart contracts for borrowing and lending
+- ✅ **Risk Scoring System** - Transparent risk assessment
+- ✅ **Interest & Penalties** - Automated calculations
+- ✅ **User Dashboards** - Track loans and reputation
+- ✅ **Loan Timelines** - Visual progress tracking
+- ✅ **Escrow Management** - Secure fund handling
+
+### In Progress 🚧
+- 🚧 **Mainnet Deployment** - Deploy to Celo mainnet
+- 🚧 **Multi-signature Treasury** - Enhanced security for loan pool
+- 🚧 **Delegation Voting** - Delegate voting power for loan approvals
+- 🚧 **Advanced Analytics Dashboard** - Detailed insights and metrics
+- 🚧 **NFT-based Membership** - Tiered membership with benefits
+- 🚧 **Cross-chain Governance** - Multi-chain support
+
+### Future Plans 🔮
+- [ ] Credit score integration with external oracles
+- [ ] Collateralized loans
+- [ ] Loan insurance pool
+- [ ] Mobile app (iOS & Android)
+- [ ] Loan marketplace with secondary trading
+- [ ] Integration with DeFi protocols
 
 ---
 
