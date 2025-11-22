@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Vote, TrendingUp, XCircle, Clock, AlertCircle, RefreshCw } from 'lucide-react';
 import { proposalAPI, APIError, type ProposalDetail } from '../config/api';
+import { useDebounce } from '../hooks/useDebounce';
 
 const ActiveProposals = () => {
   const [proposals, setProposals] = useState<ProposalDetail[]>([]);
@@ -9,11 +10,7 @@ const ActiveProposals = () => {
   const [isVoting, setIsVoting] = useState(false);
   const [voteSuccess, setVoteSuccess] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchActiveProposals();
-  }, []);
-
-  const fetchActiveProposals = async () => {
+  const fetchActiveProposals = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -51,9 +48,13 @@ const ActiveProposals = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const handleVote = async (proposalId: number, support: boolean) => {
+  useEffect(() => {
+    fetchActiveProposals();
+  }, [fetchActiveProposals]);
+
+  const handleVote = useCallback(async (proposalId: number, support: boolean) => {
     setIsVoting(true);
     setError(null);
     setVoteSuccess(null);
@@ -75,9 +76,9 @@ const ActiveProposals = () => {
     } finally {
       setIsVoting(false);
     }
-  };
+  }, [fetchActiveProposals]);
 
-  const getProposalStatus = (proposal: ProposalDetail): { status: string; color: string; icon: any } => {
+  const getProposalStatus = useCallback((proposal: ProposalDetail): { status: string; color: string; icon: any } => {
     const totalVotes = proposal.yesVotes + proposal.noVotes;
     if (totalVotes === 0) {
       return { status: 'No Votes Yet', color: 'text-gray-400', icon: Clock };
@@ -90,7 +91,13 @@ const ActiveProposals = () => {
     } else {
       return { status: 'Tied', color: 'text-yellow-400', icon: AlertCircle };
     }
-  };
+  }, []);
+
+  // Memoize filtered proposals to avoid recalculating on every render
+  const activeProposals = useMemo(() => proposals, [proposals]);
+
+  // Debounce the refresh to prevent excessive API calls
+  const debouncedRefresh = useDebounce(fetchActiveProposals, 1000);
 
   if (isLoading) {
     return (
@@ -118,7 +125,7 @@ const ActiveProposals = () => {
             Vote on active governance proposals to shape the future of the DAO
           </p>
           <button
-            onClick={fetchActiveProposals}
+            onClick={debouncedRefresh}
             className="px-6 py-2 bg-purple-500/20 border border-purple-500/40 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all flex items-center space-x-2 mx-auto"
           >
             <RefreshCw className="w-4 h-4" />
@@ -149,7 +156,7 @@ const ActiveProposals = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {proposals.map((proposal) => {
+            {activeProposals.map((proposal) => {
               const status = getProposalStatus(proposal);
               const StatusIcon = status.icon;
               const totalVotes = proposal.yesVotes + proposal.noVotes;

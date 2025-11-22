@@ -26,16 +26,17 @@ contract EchoDAO is Ownable, IEchoDAO {
     event ProposalExecuted(uint256 id);
 
     // --- Internal Struct ---
+    // Optimized storage layout: group smaller types together to save gas
     struct Proposal {
-        address target;
-        uint256 value;
-        bytes callData;
-        string description;
-        uint256 blockStart;
-        uint256 blockEnd;
-        uint256 yesVotes;
-        uint256 noVotes;
-        bool executed;
+        address target;          // 20 bytes
+        bool executed;           // 1 byte - packed with address in same slot
+        uint88 blockStart;       // 11 bytes - sufficient for block numbers, packed with above
+        uint88 blockEnd;         // 11 bytes - packed in next slot
+        uint256 value;           // 32 bytes - full slot
+        uint256 yesVotes;        // 32 bytes - full slot
+        uint256 noVotes;         // 32 bytes - full slot
+        bytes callData;          // dynamic
+        string description;      // dynamic
     }
 
     // --- Constructor ---
@@ -51,20 +52,23 @@ contract EchoDAO is Ownable, IEchoDAO {
         string calldata _description
     ) external override returns (uint256) {
         uint256 id = nextProposalId;
+        uint88 startBlock = uint88(block.number);
+        uint88 endBlock = uint88(block.number + VOTING_PERIOD_BLOCKS);
+        
         proposals[id] = Proposal({
             target: _target,
+            executed: false,
+            blockStart: startBlock,
+            blockEnd: endBlock,
             value: _value,
-            callData: _callData,
-            description: _description,
-            blockStart: block.number,
-            blockEnd: block.number + VOTING_PERIOD_BLOCKS,
             yesVotes: 0,
             noVotes: 0,
-            executed: false
+            callData: _callData,
+            description: _description
         });
 
         nextProposalId++;
-        emit ProposalCreated(id, msg.sender, block.number, block.number + VOTING_PERIOD_BLOCKS, _description);
+        emit ProposalCreated(id, msg.sender, uint256(startBlock), uint256(endBlock), _description);
         return id;
     }
 

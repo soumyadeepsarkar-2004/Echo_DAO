@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Send, Users, TrendingUp, AlertCircle, CheckCircle, ExternalLink, RefreshCw, Coins, Wallet, History, ArrowRight, ArrowLeft, Play, Clock } from 'lucide-react';
 import { fundsAPI, proposalAPI, APIError } from '../config/api';
@@ -41,12 +41,7 @@ const FundRedistribution = () => {
     pendingAmount: 0
   });
 
-  useEffect(() => {
-    // Remove auto-connect - only fetch data, wallet connects via explicit user action
-    fetchAllData();
-  }, []);
-
-  const fetchAllData = async () => {
+  const fetchAllData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -113,9 +108,14 @@ const FundRedistribution = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const getCurrentBlock = async (): Promise<number> => {
+  useEffect(() => {
+    // Remove auto-connect - only fetch data, wallet connects via explicit user action
+    fetchAllData();
+  }, [fetchAllData]);
+
+  const getCurrentBlock = useCallback(async (): Promise<number> => {
     try {
       if (!window.ethereum) return 0;
       const blockNumber = await window.ethereum.request({ method: 'eth_blockNumber' });
@@ -123,9 +123,9 @@ const FundRedistribution = () => {
     } catch {
       return 0;
     }
-  };
+  }, []);
 
-  const handleExecuteProposal = async (proposalId: number) => {
+  const handleExecuteProposal = useCallback(async (proposalId: number) => {
     if (!walletAddress) {
       setError('Please connect your wallet first');
       return;
@@ -153,9 +153,9 @@ const FundRedistribution = () => {
     } finally {
       setExecutingProposal(null);
     }
-  };
+  }, [walletAddress, fetchAllData]);
 
-  const connectWallet = async () => {
+  const connectWallet = useCallback(async () => {
     try {
       if (!window.ethereum) {
         alert('MetaMask is not installed');
@@ -168,21 +168,27 @@ const FundRedistribution = () => {
     } catch (error) {
       console.error('Error connecting wallet:', error);
     }
-  };
+  }, []);
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     await fetchAllData();
     setIsRefreshing(false);
-  };
+  }, [fetchAllData]);
 
-  const formatAddress = (address: string) => {
+  const formatAddress = useCallback((address: string) => {
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-  };
+  }, []);
 
-  const getCeloscanUrl = (txHash: string) => {
+  const getCeloscanUrl = useCallback((txHash: string) => {
     return `https://alfajores.celoscan.io/tx/${txHash}`;
-  };
+  }, []);
+
+  // Memoize calculated values
+  const uniqueRecipients = useMemo(() => 
+    new Set(recipients.map(r => r.address)).size,
+    [recipients]
+  );
 
   if (isLoading) {
     return (

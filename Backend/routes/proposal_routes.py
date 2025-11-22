@@ -5,12 +5,38 @@ from typing import Optional, List
 from blockchain.celo_interact import create_proposal, vote_proposal, get_proposal, execute_proposal
 from datetime import datetime, timedelta
 from collections import defaultdict
+import time
 
 router = APIRouter()
 
 # In-memory storage for proposal tracking (user_address -> list of timestamps)
 # In production, use a database like PostgreSQL or Redis
 user_proposal_tracking = defaultdict(list)
+
+# Simple cache for proposal list to reduce blockchain calls
+_proposal_list_cache = {
+    'data': None,
+    'timestamp': 0,
+    'ttl': 10  # Cache for 10 seconds
+}
+
+def _get_cached_proposals():
+    """Return cached proposals if still valid, None otherwise."""
+    if _proposal_list_cache['data'] is not None:
+        age = time.time() - _proposal_list_cache['timestamp']
+        if age < _proposal_list_cache['ttl']:
+            return _proposal_list_cache['data']
+    return None
+
+def _set_cached_proposals(data):
+    """Cache the proposals data."""
+    _proposal_list_cache['data'] = data
+    _proposal_list_cache['timestamp'] = time.time()
+
+def _invalidate_proposal_cache():
+    """Invalidate the proposal cache (call after mutations)."""
+    _proposal_list_cache['data'] = None
+    _proposal_list_cache['timestamp'] = 0
 
 def check_user_proposal_limit(user_address: str) -> dict:
     """
@@ -155,6 +181,9 @@ async def create_proposal_endpoint(payload: ProposalCreateRequest):
 
         # Record the proposal creation
         record_proposal_creation(payload.user_address)
+        
+        # Invalidate cache since we created a new proposal
+        _invalidate_proposal_cache()
 
         return {
             "tx_hash": tx_hash,
@@ -177,6 +206,10 @@ async def vote_endpoint(payload: VoteRequest):
         tx_hash = vote_proposal(payload.proposal_id, payload.support)
         if not tx_hash or not isinstance(tx_hash, str):
             raise HTTPException(status_code=500, detail="Vote transaction failed, no tx_hash returned.")
+        
+        # Invalidate cache after voting
+        _invalidate_proposal_cache()
+        
         return {"tx_hash": tx_hash, "message": "Vote submitted successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Vote failed: {str(e)}")
@@ -202,6 +235,9 @@ async def execute_endpoint(proposal_id: int):
         if not tx_hash or not isinstance(tx_hash, str):
             raise HTTPException(status_code=500, detail="Execute transaction failed, no tx_hash returned.")
 
+        # Invalidate cache after execution
+        _invalidate_proposal_cache()
+
         return {"tx_hash": tx_hash, "message": "Execute transaction submitted successfully.", "events": events}
     except Exception as e:
         # Surface client-friendly errors for known cases
@@ -217,6 +253,11 @@ async def list_proposals():
     Get all proposals from the blockchain.
     Optimized with batch fetching and caching.
     """
+    # Check cache first
+    cached_data = _get_cached_proposals()
+    if cached_data is not None:
+        return cached_data
+    
     try:
         # Lazy load Web3 and contract
         from web3 import Web3
@@ -269,10 +310,15 @@ async def list_proposals():
                     **proposals_dict[pid]
                 })
         
-        return {
+        result = {
             "proposals": proposals,
             "total_count": total_count
         }
+        
+        # Cache the result
+        _set_cached_proposals(result)
+        
+        return result
     except Exception as e:
         print(f"Error in list_proposals: {e}")
         import traceback
