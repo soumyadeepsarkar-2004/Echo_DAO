@@ -6,6 +6,7 @@ from blockchain.celo_interact import create_proposal, vote_proposal, get_proposa
 from datetime import datetime, timedelta
 from collections import defaultdict
 import time
+import threading
 
 router = APIRouter()
 
@@ -14,6 +15,8 @@ router = APIRouter()
 user_proposal_tracking = defaultdict(list)
 
 # Simple cache for proposal list to reduce blockchain calls
+# Note: FastAPI runs with a single worker by default, but we add thread safety for production
+_cache_lock = threading.Lock()
 _proposal_list_cache = {
     'data': None,
     'timestamp': 0,
@@ -21,22 +24,25 @@ _proposal_list_cache = {
 }
 
 def _get_cached_proposals():
-    """Return cached proposals if still valid, None otherwise."""
-    if _proposal_list_cache['data'] is not None:
-        age = time.time() - _proposal_list_cache['timestamp']
-        if age < _proposal_list_cache['ttl']:
-            return _proposal_list_cache['data']
-    return None
+    """Return cached proposals if still valid, None otherwise. Thread-safe."""
+    with _cache_lock:
+        if _proposal_list_cache['data'] is not None:
+            age = time.time() - _proposal_list_cache['timestamp']
+            if age < _proposal_list_cache['ttl']:
+                return _proposal_list_cache['data']
+        return None
 
 def _set_cached_proposals(data):
-    """Cache the proposals data."""
-    _proposal_list_cache['data'] = data
-    _proposal_list_cache['timestamp'] = time.time()
+    """Cache the proposals data. Thread-safe."""
+    with _cache_lock:
+        _proposal_list_cache['data'] = data
+        _proposal_list_cache['timestamp'] = time.time()
 
 def _invalidate_proposal_cache():
-    """Invalidate the proposal cache (call after mutations)."""
-    _proposal_list_cache['data'] = None
-    _proposal_list_cache['timestamp'] = 0
+    """Invalidate the proposal cache (call after mutations). Thread-safe."""
+    with _cache_lock:
+        _proposal_list_cache['data'] = None
+        _proposal_list_cache['timestamp'] = 0
 
 def check_user_proposal_limit(user_address: str) -> dict:
     """

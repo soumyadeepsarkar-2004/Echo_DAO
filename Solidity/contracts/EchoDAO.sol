@@ -30,6 +30,8 @@ contract EchoDAO is Ownable, IEchoDAO {
     struct Proposal {
         address target;          // 20 bytes
         bool executed;           // 1 byte - packed with address in same slot
+        // Note: uint88 used for block numbers (supports up to ~3e26 blocks)
+        // Current Ethereum/Celo block numbers are ~19M, so this is safe for centuries
         uint88 blockStart;       // 11 bytes - sufficient for block numbers, packed with above
         uint88 blockEnd;         // 11 bytes - packed in next slot
         uint256 value;           // 32 bytes - full slot

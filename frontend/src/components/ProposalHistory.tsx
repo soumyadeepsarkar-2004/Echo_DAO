@@ -59,7 +59,6 @@ const ProposalHistory = () => {
   }, [fetchProposalHistory]);
 
   // Memoize calculations to avoid recalculating on every render
-  const executedProposals = useMemo(() => proposals, [proposals]);
   const avgAmount = useMemo(() => 
     proposals.length > 0 ? (totalDistributed / proposals.length).toFixed(4) : '0',
     [proposals.length, totalDistributed]
@@ -143,7 +142,7 @@ const ProposalHistory = () => {
           </div>
         ) : (
           <div className="max-w-4xl mx-auto space-y-4">
-            {executedProposals.map((proposal) => {
+            {proposals.map((proposal) => {
               const totalVotes = proposal.yesVotes + proposal.noVotes;
               const yesPercentage = totalVotes > 0 ? ((proposal.yesVotes / totalVotes) * 100).toFixed(1) : 0;
 

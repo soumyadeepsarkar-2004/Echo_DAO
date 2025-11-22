@@ -93,9 +93,6 @@ const ActiveProposals = () => {
     }
   }, []);
 
-  // Memoize filtered proposals to avoid recalculating on every render
-  const activeProposals = useMemo(() => proposals, [proposals]);
-
   // Debounce the refresh to prevent excessive API calls
   const debouncedRefresh = useDebounce(fetchActiveProposals, 1000);
 
@@ -156,7 +153,7 @@ const ActiveProposals = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {activeProposals.map((proposal) => {
+            {proposals.map((proposal) => {
               const status = getProposalStatus(proposal);
               const StatusIcon = status.icon;
               const totalVotes = proposal.yesVotes + proposal.noVotes;
