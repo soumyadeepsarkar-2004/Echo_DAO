@@ -213,10 +213,10 @@ def vote_proposal(proposal_id: int, support: bool):
         # --- Read proposal metadata to validate voting window and previous votes ---
         try:
             proposal = dao_contract.functions.proposals(proposal_id).call()
-            # Proposal struct: target, value, callData, description, blockStart, blockEnd, yesVotes, noVotes, executed
-            block_start = int(proposal[4])
-            block_end = int(proposal[5])
-            executed = bool(proposal[8])
+            # Proposal struct: target, executed, blockStart, blockEnd, value, yesVotes, noVotes, callData, description
+            block_start = int(proposal[2])  # blockStart
+            block_end = int(proposal[3])    # blockEnd
+            executed = bool(proposal[1])    # executed
             print(f"🔎 Proposal {proposal_id} metadata: block_start={block_start}, block_end={block_end}, executed={executed}")
         except Exception as e:
             print(f"⚠️ Could not fetch proposal metadata: {e}")
@@ -279,11 +279,12 @@ def execute_proposal(proposal_id: int):
         # --- Read proposal metadata and validate execution pre-conditions ---
         try:
             p = dao_contract.functions.proposals(proposal_id).call()
-            block_start = int(p[4])
-            block_end = int(p[5])
-            yes_votes = int(p[6])
-            no_votes = int(p[7])
-            executed = bool(p[8])
+            # Updated indices for optimized struct layout
+            block_start = int(p[2])  # blockStart
+            block_end = int(p[3])    # blockEnd
+            yes_votes = int(p[5])    # yesVotes
+            no_votes = int(p[6])     # noVotes
+            executed = bool(p[1])    # executed
             print(f"🔎 Proposal {proposal_id}: block_start={block_start}, block_end={block_end}, yes={yes_votes}, no={no_votes}, executed={executed}")
         except Exception as e:
             print(f"⚠️ Could not fetch proposal metadata: {e}")
@@ -320,9 +321,9 @@ def execute_proposal(proposal_id: int):
         # --- If the proposal targets the Treasury, decode callData to determine requested amount and
         #     ensure the treasury has sufficient funds before attempting execution (avoids revert).
         try:
-            proposal_target = Web3.to_checksum_address(p[0])
-            proposal_value_wei = int(p[1])
-            call_data = p[2]
+            proposal_target = Web3.to_checksum_address(p[0])  # target
+            proposal_value_wei = int(p[4])  # value
+            call_data = p[7]  # callData
             if proposal_target.lower() == treasury_addr.lower() and call_data and len(call_data) >= 4:
                 if isinstance(call_data, bytes):
                     calldata_bytes = call_data
@@ -407,16 +408,18 @@ def get_proposal(proposal_id: int):
     """
     try:
         p = dao_contract.functions.proposals(proposal_id).call()
+        # Updated indices for optimized struct layout
+        # Proposal struct: target, executed, blockStart, blockEnd, value, yesVotes, noVotes, callData, description
         return {
             "target": p[0],
-            "value": w3.from_wei(p[1], 'ether'),
-            "callData": p[2],
-            "description": p[3],
-            "blockStart": p[4],
-            "blockEnd": p[5],
-            "yesVotes": p[6],
-            "noVotes": p[7],
-            "executed": p[8]
+            "value": w3.from_wei(p[4], 'ether'),
+            "callData": p[7],
+            "description": p[8],
+            "blockStart": p[2],
+            "blockEnd": p[3],
+            "yesVotes": p[5],
+            "noVotes": p[6],
+            "executed": p[1]
         }
     except Exception as e:
         print(f"❌ Failed to get proposal {proposal_id}: {e}")
@@ -452,14 +455,15 @@ def get_proposals_batch(proposal_ids: list) -> dict:
 def get_proposal_status(proposal_id: int):
     try:
         p = dao_contract.functions.proposals(proposal_id).call()
-        # p: target, value, callData, description, blockStart, blockEnd, yesVotes, noVotes, executed
+        # Updated indices for optimized struct layout
+        # Proposal struct: target, executed, blockStart, blockEnd, value, yesVotes, noVotes, callData, description
         return {
             "proposal_id": proposal_id,
-            "yes_votes": int(p[6]),
-            "no_votes": int(p[7]),
-            "executed": bool(p[8]),
-            "block_start": int(p[4]),
-            "block_end": int(p[5])
+            "yes_votes": int(p[5]),
+            "no_votes": int(p[6]),
+            "executed": bool(p[1]),
+            "block_start": int(p[2]),
+            "block_end": int(p[3])
         }
     except Exception as e:
         print(f"❌ Failed to get proposal status: {e}")
